@@ -1,38 +1,34 @@
-import { useState } from "react";
-import useLogin from "../Hooks/useLogin";
-import { Link } from "react-router";
-import toast from "react-hot-toast";
+import { useState } from 'react';
+import useLogin from '../Hooks/useLogin';
+import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { motion } from 'framer-motion';
 
 const LoginPage = () => {
-
-    const [loginData, setLoginData] = useState({
-        emailOrUserName: "",
-        password: "",
-    });
-
-    const { isPending, loginMutation, error } = useLogin();
+    const [loginData, setLoginData] = useState({ emailOrUserName: '', password: '' });
+    const { isPending, loginMutation } = useLogin();
 
     const handleSubmit = (e) => {
         e.preventDefault();
         loginMutation(loginData, {
-            onSuccess: () => {
-                toast.success("Login successful");
-            },
-            onError: (error) => {
-                toast.error(error.response?.data?.message || error.message);
-            }
+            onSuccess: () => toast.success('Login successful'),
+            onError: (error) => toast.error(error.response?.data?.message || error.message),
         });
-    }
+    };
 
     return (
-        <div className="min-h-screen flex">
+        <motion.div
+            className="min-h-screen flex"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5, ease: 'easeInOut' }}
+        >
             {/* LEFT SIDE - ILLUSTRATION */}
             <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-12">
                 <div className="max-w-lg text-center text-white">
                     <h1 className="text-4xl font-bold mb-6">Connect with Amazing People</h1>
-                    <p className="text-xl mb-8 opacity-90">Join thousand of creators, thinkers, and innovators sharing their knowledge and ideas.</p>
-
-                    {/* NETWORK ILLUSTRATION */}
+                    <p className="text-xl mb-8 opacity-90">Join thousands of creators, thinkers, and innovators sharing their knowledge and ideas.</p>
                     <div className="relative w-80 h-80 mx-auto">
                         <svg viewBox="0 0 320 320" className="w-full h-full">
 
@@ -69,29 +65,33 @@ const LoginPage = () => {
                 </div>
             </div>
 
-            {/* RIGHT SIDE - SIGNUP FORM */}
+            {/* RIGHT SIDE - LOGIN FORM */}
             <div className="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-12">
                 <div className="w-full max-w-md">
 
                     {/* MOBILE HEADER */}
                     <div className="lg:hidden text-center mb-8">
-                        <h1 className="text-3xl font-bold text-white mb-2">Join Us</h1>
-                        <p className="text-white opacity-90">Connect with Amazing People</p>
+                        <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
+                        <p className="text-white opacity-90">Sign in to continue</p>
                     </div>
 
-                    {/* SIGNUP FORM CARD */}
-                    <div className="bg-white rounded-3xl shadow-2xl p-8">
+                    {/* LOGIN FORM CARD */}
+                    <motion.div
+                        className="bg-white rounded-3xl shadow-2xl p-8"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                    >
                         <div className="text-center mb-8">
                             <h2 className="text-3xl font-bold text-gray-800 mb-2">Sign in to your Account</h2>
                             <p className="text-gray-600">Join our community today</p>
                         </div>
 
-                        {/* SIGNUP FORM */}
-                        <form className="space-y-6" onSubmit={handleSubmit} aria-label="SignUp Form">
-
-                            {/* USERNAME FIELD */}
+                        {/* LOGIN FORM */}
+                        <form className="space-y-6" onSubmit={handleSubmit} aria-label="Login Form">
+                            {/* USERNAME/EMAIL FIELD */}
                             <div className="relative">
-                                <input type="text" id="username" placeholder=" " value={loginData.emailOrUserName} onChange={(e) => setLoginData({ ...loginData, emailOrUserName: e.target.value })} className="peer w-full px-4 py-3 border border-gray-300 rounded-xl bg-transparent text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 outline-none transition-colors duration-200" aria-label="Username" required />
+                                <input type="text" id="username" placeholder=" " value={loginData.emailOrUserName} onChange={(e) => setLoginData({ ...loginData, emailOrUserName: e.target.value })} className="peer w-full px-4 py-3 border border-gray-300 rounded-xl bg-transparent text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 outline-none transition-colors duration-200" aria-label="Username or Email" required />
                                 <label htmlFor="username" className="absolute left-4 top-3 text-gray-500 bg-white px-1 cursor-text transition-all duration-200 ease-in-out peer-placeholder-shown:text-base peer-focus:text-sm peer-focus:-top-2 peer-focus:text-blue-500 peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-sm">
                                     Username or Email
                                 </label>
@@ -106,14 +106,14 @@ const LoginPage = () => {
                             </div>
 
                             {/* SUBMIT BUTTON */}
-                            <button type="submit" className="w-full cursor-pointer gradient-button text-white font-semibold py-3 px-4 rounded-xl hover:opacity-90 transition-all transform hover:scale-101 active:scale-95 shadow-lg" disabled={isPending} aria-busy={isPending} aria-label="Create Account">
+                            <button type="submit" className="w-full cursor-pointer gradient-button text-white font-semibold py-3 px-4 rounded-xl hover:opacity-90 transition-all transform hover:scale-101 active:scale-95 shadow-lg" disabled={isPending} aria-busy={isPending} aria-label="Login">
                                 {isPending ? (
                                     <>
                                         <span className="loading loading-spinner loading-xs" aria-hidden="true"></span>
                                         Signing in...
                                     </>
                                 ) : (
-                                    "Sign in"
+                                    'Sign in'
                                 )}
                             </button>
                         </form>
@@ -142,11 +142,12 @@ const LoginPage = () => {
                         <div className="mt-6 text-center">
                             <p className="text-gray-600 font-medium">Don't have an account? <Link to="/signup" className="text-blue-600 hover:underline font-medium">SignUp</Link></p>
                         </div>
-                    </div>
+
+                    </motion.div>
                 </div>
             </div>
-        </div>
-    )
-}
+        </motion.div>
+    );
+};
 
 export default LoginPage;

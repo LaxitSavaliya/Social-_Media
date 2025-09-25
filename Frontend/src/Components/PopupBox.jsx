@@ -13,30 +13,24 @@ import { useEffect, useState } from "react";
 const PopupBox = ({ isOpen, onClose, Data = [], label, onUpdate }) => {
     if (!isOpen) return null;
 
-
     const { authUser } = useAuthUser();
     const { userName: name } = useParams();
     const { data: notifications } = useNotifications();
 
-
     // Local state for refreshing this component only
     const [visibleData, setVisibleData] = useState(Data);
-
 
     useEffect(() => {
         setVisibleData(Data);
     }, [Data]);
 
-
     const allRequests = notifications?.sendedRequests || [];
     const pendingRecipientIds = allRequests.filter(req => req.status === "pending").map(req => req.recipient._id);
     const acceptedRecipientIds = authUser?.following?.map(req => req._id);
 
-
     const { removeOrCancelFollowMutation } = useCancelFollowReqs();
     const { followReqsMutation } = useFollowRequest();
     const queryClient = useQueryClient();
-
 
     const removeFollowerMutation = useMutation({
         mutationFn: (userId) => removeFollower(userId),
@@ -51,7 +45,6 @@ const PopupBox = ({ isOpen, onClose, Data = [], label, onUpdate }) => {
             toast.error(error.response?.data?.message || error.message);
         }
     });
-
 
     const handleRemoveFollower = (userId) => {
         if (window.confirm("Are you sure you want to remove this follower?")) {
@@ -69,7 +62,6 @@ const PopupBox = ({ isOpen, onClose, Data = [], label, onUpdate }) => {
                     </button>
                 </div>
 
-
                 <div className="flex flex-col overflow-y-auto h-80 px-4 pt-4 space-y-4 scrollbar-hide">
                     {visibleData.length === 0 ? (
                         <p className="text-center text-gray-500 text-sm py-10">No {label} yet</p>
@@ -77,7 +69,6 @@ const PopupBox = ({ isOpen, onClose, Data = [], label, onUpdate }) => {
                         visibleData.map((user) => {
                             const isRequested = pendingRecipientIds.includes(user._id);
                             const isAccepted = acceptedRecipientIds.includes(user._id);
-
 
                             return (
                                 <div key={user._id} className="flex items-center justify-between flex-shrink-0">
@@ -138,6 +129,5 @@ const PopupBox = ({ isOpen, onClose, Data = [], label, onUpdate }) => {
         </div>
     );
 };
-
 
 export default PopupBox;

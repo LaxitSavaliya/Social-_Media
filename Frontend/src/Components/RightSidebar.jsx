@@ -37,29 +37,28 @@ const RightSidebar = () => {
     };
 
     return (
-        <aside className="hidden lg:block lg:w-90 xl:w-96 p-4 xl:p-6 space-y-6 h-screen overflow-y-auto scrollbar-hide bg-gray-50">
-
+        <aside className="hidden lg:block lg:w-90 xl:w-96 p-4 xl:p-6 space-y-6 h-screen overflow-y-auto scrollbar-hide bg-gradient-to-b from-gray-50 to-white">
             {/* Suggested Users */}
             <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
                 className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 xl:p-6"
             >
                 <h3 className="font-semibold text-gray-900 mb-4">Suggested for you</h3>
-                <div className="flex flex-col space-y-4 max-h-60 overflow-y-auto scrollbar-hide">
+                <div className="flex flex-col max-h-60 overflow-y-auto scrollbar-hide">
                     {recommendedUsers.length > 0 ? recommendedUsers.map((user) => {
                         const isRequested = pendingRecipientIds.includes(user._id);
                         return (
                             <motion.div
                                 key={user._id}
-                                className="flex items-center justify-between"
+                                className="flex items-center justify-between p-2 rounded-xl hover:bg-gray-50 transition"
                                 whileHover={{ scale: 1.02 }}
-                                transition={{ type: "spring", stiffness: 300 }}
+                                transition={{ type: "spring", stiffness: 200 }}
                             >
                                 <div className="flex items-center">
                                     {user.profilePic ? (
-                                        <img src={user.profilePic} alt={user.userName} className="w-10 h-10 rounded-full object-cover" />
+                                        <img src={user.profilePic} alt={user.userName} className="w-10 h-10 rounded-full object-cover border" />
                                     ) : (
                                         <User className="w-10 h-10 rounded-full p-1.5 bg-gray-200" />
                                     )}
@@ -71,7 +70,10 @@ const RightSidebar = () => {
                                 <button
                                     onClick={() => handleFollowClick(user._id)}
                                     disabled={cancelFollowPendig || followReqsPending}
-                                    className={`py-1.5 px-4 rounded-full font-medium text-sm text-white ${isRequested ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600"}`}
+                                    className={`py-1.5 px-4 rounded-full font-medium text-sm transition-all ${isRequested
+                                        ? "bg-gray-400 cursor-not-allowed text-white"
+                                        : "bg-blue-500 hover:bg-blue-600 text-white shadow"
+                                        }`}
                                 >
                                     {isRequested ? "Requested" : "Follow"}
                                 </button>
@@ -83,23 +85,23 @@ const RightSidebar = () => {
 
             {/* Online Friends */}
             <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
                 className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 xl:p-6"
             >
                 <h3 className="font-semibold text-gray-900 mb-4">Online Friends</h3>
-                <div className="flex flex-col space-y-4 max-h-60 overflow-y-auto scrollbar-hide">
+                <div className="flex flex-col max-h-60 overflow-y-auto scrollbar-hide">
                     {allOnlineFriends.length > 0 ? allOnlineFriends.map((user) => (
                         <motion.div
                             key={user._id}
-                            className="flex items-center justify-between"
+                            className="flex items-center justify-between p-2 rounded-xl hover:bg-gray-50 transition"
                             whileHover={{ scale: 1.02 }}
-                            transition={{ type: "spring", stiffness: 300 }}
+                            transition={{ type: "spring", stiffness: 200 }}
                         >
                             <div className="flex items-center">
                                 {user.profilePic ? (
-                                    <img src={user.profilePic} alt={user.userName} className="w-10 h-10 rounded-full object-cover" />
+                                    <img src={user.profilePic} alt={user.userName} className="w-10 h-10 rounded-full object-cover border" />
                                 ) : (
                                     <User className="w-10 h-10 rounded-full p-1.5 bg-gray-200" />
                                 )}
@@ -115,7 +117,6 @@ const RightSidebar = () => {
                     )) : <p className="text-gray-500 text-sm">No friends online</p>}
                 </div>
             </motion.div>
-
         </aside>
     );
 };

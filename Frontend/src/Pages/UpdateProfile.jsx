@@ -1,4 +1,4 @@
-import { Navigate, replace, useNavigate, useParams } from "react-router";
+import { Navigate, useNavigate, useParams } from "react-router";
 import useAuthUser from "../Hooks/useAuthUser";
 import { useState } from "react";
 import useUpdateProfile from "../Hooks/useUpdateProfile";
@@ -11,14 +11,12 @@ const toInputDateFormat = (ddmmyyyy) => {
 };
 
 const UpdateProfile = () => {
-
     const navigate = useNavigate();
-
     const { userName } = useParams();
     const { authUser } = useAuthUser();
 
     if (userName !== authUser?.userName) {
-        return <Navigate to="/404" replace={true} />
+        return <Navigate to="/404" replace={true} />;
     }
 
     const [updateData, setUpdateData] = useState({
@@ -30,8 +28,8 @@ const UpdateProfile = () => {
         gender: authUser?.gender || "",
         location: authUser?.location || "",
     });
-    const [previewUrl, setPreviewUrl] = useState(authUser?.profilePic || "");
 
+    const [previewUrl, setPreviewUrl] = useState(authUser?.profilePic || "");
     const { isPending, updateProfileMutation } = useUpdateProfile();
 
     const handleSubmit = (e) => {
@@ -46,7 +44,6 @@ const UpdateProfile = () => {
         formData.append("location", updateData.location);
         formData.append("removeProfilePic", previewUrl === "" ? "true" : "false");
 
-
         updateProfileMutation({ userId: authUser?._id, updateData: formData }, {
             onSuccess: () => {
                 toast.success("Profile updated successfully");
@@ -58,50 +55,33 @@ const UpdateProfile = () => {
         });
     };
 
-
-
     return (
         <div className="min-h-screen flex items-center justify-center p-4 relative">
-
-            {/* MAIN CONTAINER */}
-
             <div className="w-full fade-in">
-
-                {/* FORM CARD */}
                 <div className="backdrop-blur-xl bg-white border border-white/20 rounded-3xl shadow-2xl p-8">
                     <h2 className="text-2xl text-center font-bold text-gray-800 mb-4">Update Your Profile</h2>
-
-                    {/* UPDATE PROFILE FORM */}
                     <form className="space-y-4" onSubmit={handleSubmit} aria-label="Update-Profile-Form">
-
-                        {/* PROFILE PICTURE */}
+                        {/* Profile Picture Section */}
                         <div className="text-center flex flex-col justify-center items-center gap-2">
                             <div className="relative inline-block group mx-auto">
                                 <img src={previewUrl || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Ccircle cx='60' cy='60' r='60' fill='%23f8fafc'/%3E%3Ccircle cx='60' cy='45' r='20' fill='%23cbd5e1'/%3E%3Cpath d='M30 100c0-16.569 13.431-30 30-30s30 13.431 30 30' fill='%23cbd5e1'/%3E%3C/svg%3E"}
                                     alt="Profile Preview" id="profilePreview" className="w-[120px] h-[120px] rounded-full object-cover border-4 border-blue-500 transition-all duration-300 ease-in-out" />
                                 <label htmlFor="profilePic" className="cursor-pointer absolute inset-0 bg-black/70 rounded-full flex items-center justify-center opacity-0 transition-all duration-300 ease-in-out hover:opacity-70">
-                                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                            d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
-                                        </path>
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                            d="M15 13a3 3 0 11-6 0 3 3 0 016 0z">
-                                        </path>
+                                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                     </svg>
                                 </label>
                             </div>
-                            <input type="file" accept="image/*" className="hidden" id="profilePic"
-                                onChange={(e) => {
-                                    const file = e.target.files[0];
-                                    setUpdateData({ ...updateData, profilePic: file });
-                                    if (file) setPreviewUrl(URL.createObjectURL(file));
-                                }} />
+                            <input type="file" accept="image/*" className="hidden" id="profilePic" onChange={(e) => {
+                                const file = e.target.files[0];
+                                setUpdateData({ ...updateData, profilePic: file });
+                                if (file) setPreviewUrl(URL.createObjectURL(file));
+                            }} />
                             <button type="button" className="bg-blue-500 text-white px-5 py-1 rounded-lg hover:bg-blue-600 transition-all duration-300 ease-in-out cursor-pointer" onClick={() => { setUpdateData({ ...updateData, profilePic: null }); setPreviewUrl(""); }}>
                                 Remove Profile Picture
                             </button>
                         </div>
-
                         {/* USERNAME */}
                         <div className="relative group">
                             <input type="text" placeholder=" " id="userName" value={updateData.userName} onChange={(e) => setUpdateData({ ...updateData, userName: e.target.value })} className="peer w-full px-4 py-3 border border-gray-300 rounded-xl bg-transparent text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 outline-none transition-colors duration-200" aria-label="Username" required />
@@ -174,19 +154,15 @@ const UpdateProfile = () => {
 
                         {/* SUBMIT */}
                         <div className="pt-2">
-                            <button type="submit" className="bg-[linear-gradient(135deg,#3b82f6_0%,#8b5cf6_100%)] shadow-[0_4px_15px_rgba(59,130,246,0.3)] transition-all duration-300 [transition-timing-function:cubic-bezier(0.4,0,0.2,1)] hover:scale-101 active:scale-95 hover:shadow-[0_8px_25px_rgba(59,130,246,0.4)] w-full px-6 py-3 rounded-xl text-base relative text-white cursor-pointer font-semibold overflow-hidden group" disabled={isPending} aria-busy={isPending} aria-label="Submit">
-                                {isPending ? (
-                                    <span className="loading loading-spinner loading-xs" aria-hidden="true">Updating...</span>
-                                ) : (
-                                    "Save Changes"
-                                )}
+                            <button type="submit" className="bg-gradient-to-r from-blue-500 to-purple-500 shadow-lg hover:scale-101 active:scale-95 w-full px-6 py-3 rounded-xl text-base text-white font-semibold" disabled={isPending} aria-busy={isPending} aria-label="Submit">
+                                {isPending ? <span className="loading loading-spinner loading-xs" aria-hidden="true">Updating...</span> : "Save Changes"}
                             </button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default UpdateProfile;

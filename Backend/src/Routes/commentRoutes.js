@@ -4,6 +4,7 @@ import { createComment, deleteComment } from '../Controllers/commentController.j
 
 const router = express.Router();
 
+// ===== PROTECTED ROUTES =====
 router.use(protectRoute);
 
 router.post('/create-comment/:postId', createComment);

@@ -5,12 +5,12 @@ import { createPost, getPosts, getUserPosts, toggleLike } from '../Controllers/p
 
 const router = express.Router();
 
+// ===== PROTECTED ROUTES =====
 router.use(protectRoute);
 
 router.post('/create-post', upload.fields([{ name: 'image' }, { name: 'video' }]), createPost);
 router.get('/get-posts', getPosts);
 router.get('/get-user-posts/:postId', getUserPosts);
-
 router.post('/:postId/like', toggleLike);
 
 export default router;

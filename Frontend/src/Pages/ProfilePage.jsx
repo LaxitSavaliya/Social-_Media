@@ -66,32 +66,19 @@ const ProfilePage = () => {
         >
             {/* PROFILE HEADER */}
             <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-14">
-                {/* Profile Picture */}
                 {user?.profilePic ? (
-                    <img
-                        src={user.profilePic}
-                        alt="Profile"
-                        className="w-32 h-32 md:w-44 md:h-44 rounded-full border-2 border-gray-200 object-cover"
-                    />
+                    <img src={user.profilePic} alt="Profile" className="w-32 h-32 md:w-44 md:h-44 rounded-full border-2 border-gray-200 object-cover" />
                 ) : (
                     <User className="w-32 h-32 md:w-44 md:h-44 p-5 rounded-full border-2 border-gray-200 text-gray-400" />
                 )}
 
-                {/* Profile Info */}
                 <div className="flex-1 flex flex-col gap-4 md:gap-6 w-full">
-                    {/* Username + Actions */}
                     <div className="flex flex-wrap items-center gap-3">
                         <h1 className="text-2xl font-semibold">{user.userName}</h1>
 
                         {user._id !== authUser?._id ? (
                             <div className="flex flex-wrap gap-2 md:gap-3 ml-0 md:ml-10">
-                                <button
-                                    onClick={handleFollowClick}
-                                    className={`px-5 py-1.5 rounded-lg text-sm font-medium transition-colors ${isRequested || isMyFollowing ? "bg-gray-200 hover:bg-gray-300" : "bg-blue-500 hover:bg-blue-600 text-white"
-                                        }`}
-                                >
-                                    {isRequested ? "Requested" : isMyFollowing ? "Following" : "Follow"}
-                                </button>
+                                <button onClick={handleFollowClick} className={`px-5 py-1.5 rounded-lg text-sm font-medium transition-colors ${isRequested || isMyFollowing ? "bg-gray-200 hover:bg-gray-300" : "bg-blue-500 hover:bg-blue-600 text-white"}`}>{isRequested ? "Requested" : isMyFollowing ? "Following" : "Follow"}</button>
                                 <button className="px-5 py-1.5 rounded-lg text-sm bg-gray-200 hover:bg-gray-300">Message</button>
                                 <Ellipsis className="w-5 h-5 text-gray-600 cursor-pointer" />
                             </div>
@@ -104,35 +91,12 @@ const ProfilePage = () => {
                         )}
                     </div>
 
-                    {/* Stats */}
                     <div className="flex flex-wrap gap-6 text-sm md:text-base">
-                        <div className="flex items-center gap-1">
-                            <span className="font-semibold">{userPosts?.length || 0}</span>
-                            <span className="text-gray-600">Posts</span>
-                        </div>
-                        <button
-                            onClick={() => {
-                                setOpenFollowersBox(true);
-                                setLabel("Followers");
-                            }}
-                            className="flex items-center gap-1 cursor-pointer"
-                        >
-                            <span className="font-semibold">{user?.followers?.length || 0}</span>
-                            <span className="text-gray-600">Followers</span>
-                        </button>
-                        <button
-                            onClick={() => {
-                                setOpenFollowingBox(true);
-                                setLabel("Following");
-                            }}
-                            className="flex items-center gap-1 cursor-pointer"
-                        >
-                            <span className="font-semibold">{user?.following?.length || 0}</span>
-                            <span className="text-gray-600">Following</span>
-                        </button>
+                        <div className="flex items-center gap-1"><span className="font-semibold">{userPosts?.length || 0}</span><span className="text-gray-600">Posts</span></div>
+                        <button onClick={() => { setOpenFollowersBox(true); setLabel("Followers"); }} className="flex items-center gap-1 cursor-pointer"><span className="font-semibold">{user?.followers?.length || 0}</span><span className="text-gray-600">Followers</span></button>
+                        <button onClick={() => { setOpenFollowingBox(true); setLabel("Following"); }} className="flex items-center gap-1 cursor-pointer"><span className="font-semibold">{user?.following?.length || 0}</span><span className="text-gray-600">Following</span></button>
                     </div>
 
-                    {/* Full Name + Bio */}
                     <div className="text-sm md:text-base">
                         <h2 className="font-medium">{user.fullName}</h2>
                         <p className="text-gray-600">{user.bio}</p>
@@ -140,49 +104,16 @@ const ProfilePage = () => {
                 </div>
             </div>
 
-            {/* POSTS GRID */}
             <div className="mt-8 md:mt-10 border-t pt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
-                {userPosts?.length > 0 ? (
-                    userPosts.map((post) => (
-                        <motion.div
-                            key={post._id}
-                            whileHover={{ scale: 1.05 }}
-                            transition={{ type: "spring", stiffness: 300 }}
-                            className="relative overflow-hidden rounded-lg group"
-                        >
-                            <Link to={`/post/${post._id}`}>
-                                <img
-                                    src={post.image || post.video}
-                                    alt="Post"
-                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300 border border-gray-200"
-                                />
-                            </Link>
-                        </motion.div>
-                    ))
-                ) : (
-                    <p className="text-gray-500 text-center col-span-full py-10">No posts yet</p>
-                )}
+                {userPosts?.length > 0 ? userPosts.map((post) => (
+                    <motion.div key={post._id} whileHover={{ scale: 1.05 }} transition={{ type: "spring", stiffness: 300 }} className="relative overflow-hidden rounded-lg group">
+                        <Link to={`/post/${post._id}`}><img src={post.image || post.video} alt="Post" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300 border border-gray-200" /></Link>
+                    </motion.div>
+                )) : <p className="text-gray-500 text-center col-span-full py-10">No posts yet</p>}
             </div>
 
-            <PopupBox
-                isOpen={openFollowersBox}
-                onClose={() => setOpenFollowersBox(false)}
-                Data={user?.followers || []}
-                label={label}
-                onUpdate={async () => {
-                    await queryClient.invalidateQueries({ queryKey: ["users", userName] });
-                }}
-            />
-            <PopupBox
-                isOpen={openFollowingBox}
-                onClose={() => setOpenFollowingBox(false)}
-                Data={user?.following || []}
-                label={label}
-                onUpdate={async () => {
-                    await queryClient.invalidateQueries({ queryKey: ["users", userName] });
-                }}
-            />
-
+            <PopupBox isOpen={openFollowersBox} onClose={() => setOpenFollowersBox(false)} Data={user?.followers || []} label={label} onUpdate={async () => { await queryClient.invalidateQueries({ queryKey: ["users", userName] }); }} />
+            <PopupBox isOpen={openFollowingBox} onClose={() => setOpenFollowingBox(false)} Data={user?.following || []} label={label} onUpdate={async () => { await queryClient.invalidateQueries({ queryKey: ["users", userName] }); }} />
         </motion.div>
     );
 };

@@ -38,46 +38,28 @@ const Notification = () => {
                                 transition={{ duration: 0.3 }}
                                 className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition"
                             >
-                                {/* Sender Avatar */}
                                 {notif?.sender?.profilePic ? (
-                                    <img
-                                        src={notif.sender.profilePic}
-                                        alt={notif.sender.userName}
-                                        className="w-12 h-12 rounded-full object-cover border border-gray-200"
-                                    />
+                                    <img src={notif.sender.profilePic} alt={notif.sender.userName} className="w-12 h-12 rounded-full object-cover border border-gray-200" />
                                 ) : (
                                     <User className="w-12 h-12 p-2 rounded-full object-cover border border-gray-200 text-gray-400" />
                                 )}
 
-                                {/* Notification Text */}
                                 <div className="flex-1 text-sm">
-                                    <Link
-                                        to={`/profile/${notif?.sender?.userName}`}
-                                        className="font-semibold mr-1"
-                                    >
+                                    <Link to={`/profile/${notif?.sender?.userName}`} className="font-semibold mr-1">
                                         {notif.sender.userName}
                                     </Link>
-                                    {notif.status === "pending"
-                                        ? "sent you a follow request"
-                                        : "started following you"}
+                                    {notif.status === "pending" ? "sent you a follow request" : "started following you"}
                                     <div className="text-gray-400 text-xs mt-1">{timeAgo(notif.updatedAt)}</div>
                                 </div>
 
-                                {/* Actions */}
                                 {notif.status === "pending" && (
                                     <div className="flex gap-2 ml-auto flex-shrink-0">
-                                        <button
-                                            onClick={() => acceptFollowReqsMutation(notif._id)}
-                                            className="px-3 py-1 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-sm transition"
-                                        >
+                                        <motion.button whileTap={{ scale: 0.95 }} onClick={() => acceptFollowReqsMutation(notif._id)} className="px-3 py-1 rounded-lg bg-blue-500 hover:bg-blue-600 text-white text-sm transition">
                                             Confirm
-                                        </button>
-                                        <button
-                                            onClick={() => removeOrCancelFollowMutation(notif.sender._id)}
-                                            className="px-3 py-1 rounded-lg bg-gray-200 hover:bg-gray-300 text-sm transition"
-                                        >
+                                        </motion.button>
+                                        <motion.button whileTap={{ scale: 0.95 }} onClick={() => removeOrCancelFollowMutation(notif.sender._id)} className="px-3 py-1 rounded-lg bg-gray-200 hover:bg-gray-300 text-sm transition">
                                             Cancel
-                                        </button>
+                                        </motion.button>
                                     </div>
                                 )}
                             </motion.li>

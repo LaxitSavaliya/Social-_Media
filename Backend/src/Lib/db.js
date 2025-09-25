@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 export const connectDB = async () => {
     if (!process.env.MONGO_URI) {
-        console.error('Error: MONGO_URI is not defined in the environment variables.');
+        console.error('Error: MONGO_URI is not defined in environment variables.');
         process.exit(1);
     }
 
@@ -13,4 +13,4 @@ export const connectDB = async () => {
         console.error(`❌ Error: ${error.message}`);
         process.exit(1);
     }
-}
+};

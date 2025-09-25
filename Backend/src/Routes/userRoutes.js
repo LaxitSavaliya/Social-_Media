@@ -5,16 +5,13 @@ import { fetchUsers, getNotifications, getProfileByUsername, getRecommendedUsers
 
 const router = express.Router();
 
+// ===== PROTECTED ROUTES =====
 router.use(protectRoute);
 
 router.get('/notifications', getNotifications);
-
 router.get('/recommended-users', getRecommendedUsers);
-
 router.get('/:userName', getProfileByUsername);
-
 router.get('/fetch-users/:name', fetchUsers);
-
 router.patch('/update-profile/:userId', upload.fields([{ name: 'image' }, { name: 'video' }]), updateProfile);
 
 export default router;

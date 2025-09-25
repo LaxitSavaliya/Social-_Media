@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import PostCard from "../Components/PostCard";
 
 const HomePage = () => {
-    const stories = ["Sarah", "John"];
+    const stories = ["Sarah", "John", "Emma", "Alex", "Mia", "James"];
 
     return (
         <div className="flex justify-center w-full">
@@ -10,34 +10,35 @@ const HomePage = () => {
 
                 {/* STORIES */}
                 <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
                     className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4 sm:p-6 mb-4 sm:mb-6 mt-4 sm:mt-6"
                 >
                     <div className="flex space-x-4 overflow-x-auto scrollbar-hide">
                         {stories.map((name, i) => (
-                            <motion.div
-                                key={i}
-                                className="flex-shrink-0 text-center"
-                                whileHover={{ scale: 1.1 }}
-                                transition={{ type: "spring", stiffness: 300 }}
-                            >
-                                <div className="story-ring rounded-full">
+                            <div key={i} className="flex-shrink-0 text-center">
+                                <div className="relative p-[2px] rounded-full bg-gradient-to-tr from-pink-500 via-yellow-500 to-purple-500">
                                     <img
-                                        src={`data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='32' fill='%23f59e0b'/%3E%3Ctext x='32' y='40' text-anchor='middle' font-size='24' fill='white'%3E👩%3C/text%3E%3C/svg%3E`}
+                                        src={`https://ui-avatars.com/api/?name=${name}&background=random`}
                                         alt="Story"
-                                        className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover"
+                                        className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-white"
                                     />
                                 </div>
-                                <p className="text-xs mt-2 text-gray-600">{name}</p>
-                            </motion.div>
+                                <p className="text-xs mt-2 text-gray-600 truncate w-14 sm:w-16">{name}</p>
+                            </div>
                         ))}
                     </div>
                 </motion.div>
 
                 {/* POSTS */}
-                <PostCard />
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                >
+                    <PostCard />
+                </motion.div>
 
             </div>
         </div>

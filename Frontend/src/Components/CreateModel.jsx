@@ -39,17 +39,8 @@ const CreateModel = ({ onClose }) => {
         return () => { document.body.style.overflow = "auto"; };
     }, []);
 
-    const handleDrop = (e) => {
-        e.preventDefault();
-        const file = e.dataTransfer.files[0];
-        if (file) setSelectedFile(URL.createObjectURL(file));
-    };
-
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) setSelectedFile(URL.createObjectURL(file));
-    };
-
+    const handleDrop = (e) => { e.preventDefault(); const file = e.dataTransfer.files[0]; if (file) setSelectedFile(URL.createObjectURL(file)); };
+    const handleFileChange = (e) => { const file = e.target.files[0]; if (file) setSelectedFile(URL.createObjectURL(file)); };
     const handleCropComplete = useCallback((_, pixels) => setCroppedAreaPixels(pixels), []);
 
     const getCroppedImg = (imageSrc, pixelCrop) => {
@@ -64,21 +55,8 @@ const CreateModel = ({ onClose }) => {
                 const scaleY = image.naturalHeight / image.height;
                 canvas.width = pixelCrop.width * scaleX;
                 canvas.height = pixelCrop.height * scaleY;
-                ctx.drawImage(
-                    image,
-                    pixelCrop.x * scaleX,
-                    pixelCrop.y * scaleY,
-                    pixelCrop.width * scaleX,
-                    pixelCrop.height * scaleY,
-                    0,
-                    0,
-                    pixelCrop.width * scaleX,
-                    pixelCrop.height * scaleY
-                );
-                canvas.toBlob((blob) => {
-                    if (!blob) return reject(new Error("Canvas is empty"));
-                    resolve({ blob, croppedUrl: URL.createObjectURL(blob) });
-                }, "image/jpeg", 1);
+                ctx.drawImage(image, pixelCrop.x * scaleX, pixelCrop.y * scaleY, pixelCrop.width * scaleX, pixelCrop.height * scaleY, 0, 0, pixelCrop.width * scaleX, pixelCrop.height * scaleY);
+                canvas.toBlob((blob) => { if (!blob) return reject(new Error("Canvas is empty")); resolve({ blob, croppedUrl: URL.createObjectURL(blob) }); }, "image/jpeg", 1);
             };
             image.onerror = (err) => reject(err);
         });
@@ -96,64 +74,26 @@ const CreateModel = ({ onClose }) => {
                 canvas.height = image.naturalHeight;
                 ctx.filter = filter;
                 ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-                canvas.toBlob((blob) => {
-                    if (!blob) return reject(new Error("Canvas is empty"));
-                    resolve({ blob, filteredUrl: URL.createObjectURL(blob) });
-                }, "image/jpeg", 1);
+                canvas.toBlob((blob) => { if (!blob) return reject(new Error("Canvas is empty")); resolve({ blob, filteredUrl: URL.createObjectURL(blob) }); }, "image/jpeg", 1);
             };
             image.onerror = (err) => reject(err);
         });
     };
 
-    const handleNext = async () => {
-        if (!croppedAreaPixels) return;
-        try {
-            const { croppedUrl } = await getCroppedImg(selectedFile, croppedAreaPixels);
-            setCroppedFile(croppedUrl);
-            setStep("Filter");
-        } catch (err) { console.error(err); }
-    };
-
-    const handleImageChange = async () => {
-        try {
-            const { filteredUrl, blob } = await getFilteredImg(croppedFile, filters[selectedFilter]);
-            setPreview(filteredUrl);
-            setPostData({ ...postData, files: blob });
-            setStep("Create New Post");
-        } catch (err) { console.error(err); }
-    };
-
-    const handleSubmit = () => {
-        if (!postData.files) return toast.error("Add an image first");
-        const formData = new FormData();
-        formData.append("content", postData.content);
-        formData.append("image", postData.files);
-        createPostMutation(formData, {
-            onSuccess: () => { toast.success("Post created successfully"); onClose(); },
-            onError: (err) => toast.error(err.response?.data?.message || err.message),
-        });
-    };
-
-    const handleBack = () => {
-        if (step === "Create New Post") { setStep("Filter"); setPostData({ ...postData, files: null, content: "" }); setPreview(null); }
-        else if (step === "Filter") { setStep("Crop"); setCroppedFile(null); setSelectedFilter("Normal"); }
-        else setSelectedFile(null);
-    };
+    const handleNext = async () => { if (!croppedAreaPixels) return; try { const { croppedUrl } = await getCroppedImg(selectedFile, croppedAreaPixels); setCroppedFile(croppedUrl); setStep("Filter"); } catch (err) { console.error(err); } };
+    const handleImageChange = async () => { try { const { filteredUrl, blob } = await getFilteredImg(croppedFile, filters[selectedFilter]); setPreview(filteredUrl); setPostData({ ...postData, files: blob }); setStep("Create New Post"); } catch (err) { console.error(err); } };
+    const handleSubmit = () => { if (!postData.files) return toast.error("Add an image first"); const formData = new FormData(); formData.append("content", postData.content); formData.append("image", postData.files); createPostMutation(formData, { onSuccess: () => { toast.success("Post created successfully"); onClose(); }, onError: (err) => toast.error(err.response?.data?.message || err.message) }); };
+    const handleBack = () => { if (step === "Create New Post") { setStep("Filter"); setPostData({ ...postData, files: null, content: "" }); setPreview(null); } else if (step === "Filter") { setStep("Crop"); setCroppedFile(null); setSelectedFilter("Normal"); } else setSelectedFile(null); };
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
             <X className="absolute top-5 right-5 text-white h-8 w-8 cursor-pointer hover:text-gray-300" onClick={onClose} />
             <div className="w-11/12 max-w-5xl h-[85vh] bg-white border rounded-2xl shadow-2xl flex flex-col overflow-hidden">
-
-                {/* Header */}
                 {selectedFile ? (
                     <div className="flex items-center justify-between border-b px-4 py-3">
                         <ArrowLeft onClick={handleBack} className="cursor-pointer hover:text-gray-600" disabled={isPending} />
                         <h3 className="text-lg font-semibold">{step}</h3>
-                        <button onClick={() => { step === "Crop" ? handleNext() : step === "Filter" ? handleImageChange() : handleSubmit(); }}
-                            className="text-blue-500 font-semibold hover:text-blue-600 cursor-pointer" disabled={isPending}>
-                            {step === "Create New Post" ? (isPending ? "Posting..." : "Share") : "Next"}
-                        </button>
+                        <button onClick={() => { step === "Crop" ? handleNext() : step === "Filter" ? handleImageChange() : handleSubmit(); }} className="text-blue-500 font-semibold hover:text-blue-600 cursor-pointer" disabled={isPending}>{step === "Create New Post" ? (isPending ? "Posting..." : "Share") : "Next"}</button>
                     </div>
                 ) : (
                     <div className="flex items-center justify-center border-b py-3">
@@ -161,7 +101,6 @@ const CreateModel = ({ onClose }) => {
                     </div>
                 )}
 
-                {/* Body */}
                 <div className="flex-1 overflow-hidden">
                     <AnimatePresence mode="wait">
                         {!selectedFile ? (

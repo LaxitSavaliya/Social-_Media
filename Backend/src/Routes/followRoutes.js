@@ -4,13 +4,12 @@ import { acceptFollowRequest, followRequest, removeFollower, removeOrCancelFollo
 
 const router = express.Router();
 
+// ===== PROTECTED ROUTES =====
 router.use(protectRoute);
 
 router.post('/follow-request/:userId', followRequest);
-
 router.put('/follow-request/:requestId/accept', acceptFollowRequest);
 router.delete('/follow-request/:userId/removeOrCancelFollow', removeOrCancelFollow);
-
 router.post('/remove-follower/:userId', removeFollower);
 
 export default router;

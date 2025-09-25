@@ -1,3 +1,4 @@
+// Social_Media/Backend/src/server.js
 import express from 'express';
 import 'dotenv/config';
 import cookieParser from 'cookie-parser';
@@ -17,7 +18,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:5173';
 
-// ===== SECURITY MIDDLEWARE =====
+// ===== MIDDLEWARE =====
 app.use(helmet()); // Security headers
 app.use(
     cors({
@@ -26,16 +27,18 @@ app.use(
     })
 );
 
-app.use(express.json());
-app.use(cookieParser());
+app.use(express.json()); // Parse JSON bodies
+app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
+app.use(cookieParser()); // Parse cookies
 
 // ===== LOGGER =====
 if (process.env.NODE_ENV === 'development') {
-    app.use(morgan('dev')); // Dev-friendly logging
+    app.use(morgan('dev'));
 } else {
-    app.use(morgan('combined')); // Production-friendly logging
+    app.use(morgan('combined'));
 }
 
+// ===== ROUTES =====
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
@@ -43,17 +46,15 @@ app.use('/api/comments', commentRoutes);
 app.use('/api/follows', followRoutes);
 
 // ===== 404 HANDLER =====
-app.use((req, res, next) => {
-    res.status(404).json({
-        message: "Route not found"
-    });
+app.use((req, res) => {
+    res.status(404).json({ message: 'Route not found' });
 });
 
 // ===== ERROR HANDLER =====
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).json({
-        message: "Internal server error"
+    res.status(err.status || 500).json({
+        message: err.message || 'Internal server error',
     });
 });
 
@@ -62,12 +63,12 @@ const startServer = async () => {
     try {
         await connectDB();
         app.listen(PORT, () => {
-            console.log(`Server is running on port http://localhost:${PORT}`);
+            console.log(`Server running on http://localhost:${PORT}`);
         });
     } catch (error) {
-        console.error('Error starting the server:', error.message);
+        console.error('Failed to start server:', error);
         process.exit(1);
     }
-}
+};
 
 startServer();

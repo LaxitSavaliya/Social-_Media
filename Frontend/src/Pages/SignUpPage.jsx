@@ -1,44 +1,39 @@
-import { useState } from "react";
-import useSignUp from "../Hooks/useSignUp";
-import { Link } from "react-router";
-import toast from "react-hot-toast";
+import { useState } from 'react';
+import useSignUp from '../Hooks/useSignUp';
+import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import { motion } from 'framer-motion';
 
 const SignUpPage = () => {
-
-    const [signUpData, setSignUpData] = useState({
-        fullName: "",
-        userName: "",
-        email: "",
-        password: "",
-    });
-
-    const { isPending, signUpMutation, error } = useSignUp();
+    const [signUpData, setSignUpData] = useState({ fullName: '', userName: '', email: '', password: '' });
+    const { isPending, signUpMutation } = useSignUp();
 
     const handleSubmit = (e) => {
         e.preventDefault();
         if (signUpData.password.length < 6) {
-            toast.error("Password must be at least 6 characters long");
+            toast.error('Password must be at least 6 characters long');
             return;
         }
+
         signUpMutation(signUpData, {
-            onSuccess: () => {
-                toast.success("Account created successfully");
-            },
-            onError: (error) => {
-                toast.error(error.response?.data?.message || error.message);
-            }
+            onSuccess: () => toast.success('Account created successfully'),
+            onError: (error) => toast.error(error.response?.data?.message || error.message),
         });
-    }
+    };
 
     return (
-        <div className="min-h-screen flex">
+        <motion.div
+            className="min-h-screen flex"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5, ease: 'easeInOut' }}
+        >
             {/* LEFT SIDE - ILLUSTRATION */}
             <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-12">
                 <div className="max-w-lg text-center text-white">
                     <h1 className="text-4xl font-bold mb-6">Connect with Amazing People</h1>
-                    <p className="text-xl mb-8 opacity-90">Join thousand of creators, thinkers, and innovators sharing their knowledge and ideas.</p>
-
-                    {/* NETWORK ILLUSTRATION */}
+                    <p className="text-xl mb-8 opacity-90">Join thousands of creators, thinkers, and innovators sharing their knowledge and ideas.</p>
                     <div className="relative w-80 h-80 mx-auto">
                         <svg viewBox="0 0 320 320" className="w-full h-full">
 
@@ -86,7 +81,13 @@ const SignUpPage = () => {
                     </div>
 
                     {/* SIGNUP FORM CARD */}
-                    <div className="bg-white rounded-3xl shadow-2xl p-8">
+                    <motion.div
+                        className="bg-white rounded-3xl shadow-2xl p-8"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                    >
+                        {/* FORM HEADER */}
                         <div className="text-center mb-8">
                             <h2 className="text-3xl font-bold text-gray-800 mb-2">Create an Account</h2>
                             <p className="text-gray-600">Join our community today</p>
@@ -172,11 +173,12 @@ const SignUpPage = () => {
                         <div className="mt-6 text-center">
                             <p className="text-gray-600 font-medium">Already have an account? <Link to="/login" className="text-blue-600 hover:underline font-medium">Sign in</Link></p>
                         </div>
-                    </div>
+
+                    </motion.div>
                 </div>
             </div>
-        </div>
-    )
-}
+        </motion.div>
+    );
+};
 
 export default SignUpPage;
