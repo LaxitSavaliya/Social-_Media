@@ -98,3 +98,12 @@ export const removeFollower = async (userId) => {
     const response = await axiosInstance.post(`/follows/remove-follower/${userId}`);
     return response.data;
 };
+
+export const updateProfile = async (userId, updateData) => {
+    const response = await axiosInstance.patch(`/users/update-profile/${userId}`, updateData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        }
+    });
+    return response.data;
+}

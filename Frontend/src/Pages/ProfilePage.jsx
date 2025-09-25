@@ -97,7 +97,7 @@ const ProfilePage = () => {
                             </div>
                         ) : (
                             <div className="flex flex-wrap gap-2 md:gap-3 ml-0 md:ml-10">
-                                <button className="px-5 py-1.5 rounded-lg text-sm bg-gray-200 hover:bg-gray-300">Edit Profile</button>
+                                <Link to={`/profile/${userName}/update-profile`} className="px-5 py-1.5 rounded-lg text-sm bg-gray-200 hover:bg-gray-300">Edit Profile</Link>
                                 <button className="px-5 py-1.5 rounded-lg text-sm bg-gray-200 hover:bg-gray-300">View Archive</button>
                                 <Settings className="w-5 h-5 text-gray-600 cursor-pointer" />
                             </div>

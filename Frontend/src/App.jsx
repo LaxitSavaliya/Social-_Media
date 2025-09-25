@@ -12,6 +12,8 @@ import PostPage from "./Pages/PostPage";
 import PageLoader from "./Components/PageLoader";
 import Layout from "./Components/Layout";
 import useAuthUser from "./Hooks/useAuthUser";
+import PageNotFound from "./Pages/PageNotFound";
+import UpdateProfile from "./Pages/UpdateProfile";
 
 // --- Protected Route Wrapper ---
 const ProtectedRoute = ({ children }) => {
@@ -79,6 +81,19 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/profile/:userName/update-profile"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <UpdateProfile />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route path="*" element={<PageNotFound />} />
+
       </Routes>
 
       <Toaster />
