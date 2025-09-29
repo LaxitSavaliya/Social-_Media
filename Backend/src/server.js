@@ -5,14 +5,18 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import http from 'http';
+import { Server, Socket } from 'socket.io';
 
 import authRoutes from './Routes/authRoutes.js';
 import userRoutes from './Routes/userRoutes.js';
 import postRoutes from './Routes/postRoutes.js';
 import commentRoutes from './Routes/commentRoutes.js';
 import followRoutes from './Routes/followRoutes.js';
+import messageRoutes from './Routes/messageRoutes.js';
 
 import { connectDB } from './Lib/db.js';
+import Message from './Models/Message.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -44,6 +48,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/follows', followRoutes);
+app.use('/api/messages', messageRoutes);
 
 // ===== 404 HANDLER =====
 app.use((req, res) => {
@@ -58,11 +63,45 @@ app.use((err, req, res, next) => {
     });
 });
 
+const server = http.createServer(app);
+
+const io = new Server(server, {
+    cors: {
+        origin: CORS_ORIGIN,
+        credentials: true,
+    }
+});
+
+io.on('connection', (socket) => {
+    console.log('🔌 User connected:', socket.id);
+
+    socket.on('join', (userId) => {
+        socket.join(userId);
+        console.log(`✅ User ${userId} joined their room`);
+    });
+
+    socket.on('sendMessage', async ({ sender, recipient, text }) => {
+        try {
+            const message = await Message.create({ sender, recipient, text });
+
+            io.to(recipient).emit('receiveMessage', message);
+            io.to(sender).emit('messageSent', message);
+
+        } catch (error) {
+            console.error('❌ Error saving message:', error.message);
+        }
+    });
+
+    socket.on('disconnect', () => {
+        console.log('❌ User disconnected:', socket.id);
+    });
+});
+
 // ===== START SERVER =====
 const startServer = async () => {
     try {
         await connectDB();
-        app.listen(PORT, () => {
+        server.listen(PORT, () => {
             console.log(`Server running on http://localhost:${PORT}`);
         });
     } catch (error) {

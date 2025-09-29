@@ -15,6 +15,7 @@ import PageNotFound from './Pages/PageNotFound';
 import PageLoader from './Components/PageLoader';
 import Layout from './Components/Layout';
 import useAuthUser from './Hooks/useAuthUser';
+import ChatPage from './Pages/ChatPage';
 
 // --- Protected Route Wrapper ---
 const ProtectedRoute = ({ children }) => {
@@ -56,6 +57,8 @@ const App = () => {
           <Route path='/notifications' element={<ProtectedRoute><Layout><PageMotion><Notification /></PageMotion></Layout></ProtectedRoute>} />
           <Route path='/post/:postId' element={<ProtectedRoute><Layout><PageMotion><PostPage /></PageMotion></Layout></ProtectedRoute>} />
           <Route path='/profile/:userName/update-profile' element={<ProtectedRoute><Layout><PageMotion><UpdateProfile /></PageMotion></Layout></ProtectedRoute>} />
+          <Route path='/chat' element={<ProtectedRoute><Layout><PageMotion><ChatPage /></PageMotion></Layout></ProtectedRoute>} />
+          <Route path='/chat/:userId' element={<ProtectedRoute><Layout><PageMotion><ChatPage showChat /></PageMotion></Layout></ProtectedRoute>} />
 
           {/* 404 */}
           <Route path='*' element={<PageMotion><PageNotFound /></PageMotion>} />

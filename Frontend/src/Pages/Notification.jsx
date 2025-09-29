@@ -21,7 +21,7 @@ const Notification = () => {
     const { removeOrCancelFollowMutation } = useCancelFollowReqs();
 
     return (
-        <div className="max-w-xl mx-auto mt-6 p-4 bg-white rounded-2xl shadow-md">
+        <div className="max-w-xl mx-auto my-15 md:my-3 p-3">
             <h2 className="text-xl font-semibold mb-4">Notifications</h2>
 
             {notificationList.length === 0 ? (
@@ -36,7 +36,7 @@ const Notification = () => {
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
                                 transition={{ duration: 0.3 }}
-                                className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition"
+                                className="flex items-center gap-3 py-3 rounded-lg hover:bg-gray-50 transition"
                             >
                                 {notif?.sender?.profilePic ? (
                                     <img src={notif.sender.profilePic} alt={notif.sender.userName} className="w-12 h-12 rounded-full object-cover border border-gray-200" />
@@ -48,8 +48,8 @@ const Notification = () => {
                                     <Link to={`/profile/${notif?.sender?.userName}`} className="font-semibold mr-1">
                                         {notif.sender.userName}
                                     </Link>
-                                    {notif.status === "pending" ? "sent you a follow request" : "started following you"}
-                                    <div className="text-gray-400 text-xs mt-1">{timeAgo(notif.updatedAt)}</div>
+                                    <span className="text-gray-400 text-xs mt-1">{timeAgo(notif.updatedAt)}</span>
+                                    <p className="text-sm">{notif.status === "pending" ? "sent you a follow request" : "started following you"}</p>
                                 </div>
 
                                 {notif.status === "pending" && (

@@ -25,7 +25,7 @@ export async function getProfileByUsername(req, res) {
 
         if (!user) return res.status(404).json({ message: 'User not found' });
 
-        const userPosts = await Post.find({ postedBy: user._id });
+        const userPosts = await Post.find({ postedBy: user._id }).sort({ createdAt: -1 });
         res.status(200).json({ user, userPosts });
     } catch (error) {
         console.error('Error in getProfileByUsername:', error.message);
@@ -80,7 +80,7 @@ export async function fetchUsers(req, res) {
                 { userName: { $regex: name, $options: 'i' } },
                 { fullName: { $regex: name, $options: 'i' } }
             ]
-        }).select('userName fullName profilePic');
+        }).select('userName fullName profilePic').limit(10);
 
         res.status(200).json({ users });
     } catch (error) {

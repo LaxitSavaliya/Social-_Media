@@ -41,7 +41,7 @@ const PostPage = () => {
         (post) => {
             if (!post?.likes) return [];
             const allUsers = [...allFriends, ...post.likes];
-            const uniqueUsers = allUsers.filter((user, index, self) => self.findIndex(u => u._id === user._id) === index);
+            const uniqueUsers = allUsers.filter((user, index, self) => self.findIndex(u => u._id === user._id) !== index);
             return uniqueUsers;
         },
         [allFriends]
@@ -52,7 +52,7 @@ const PostPage = () => {
     const hasLiked = post?.likes?.some(like => like?._id?.toString() === authUser?._id);
 
     return (
-        <div className="max-w-5xl mx-auto p-4 sm:p-6 bg-gray-50">
+        <div className="max-w-5xl mx-auto pt-15 md:pt-10 p-4 bg-gray-50">
             {/* Main Post Section */}
             <motion.div
                 className="flex flex-col md:flex-row h-auto md:h-[85vh] border border-gray-200 rounded-xl bg-white shadow-sm overflow-hidden"

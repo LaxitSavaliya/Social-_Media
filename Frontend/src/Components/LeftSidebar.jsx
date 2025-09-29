@@ -14,7 +14,7 @@ const navItems = [
     { path: '/', label: 'Home', icon: <House className="w-6 h-6" /> },
     { path: '/search', label: 'Search', icon: <Search className="w-6 h-6" /> },
     { path: '/explore', label: 'Explore', icon: <Compass className="w-6 h-6" /> },
-    { path: '/messages', label: 'Messages', icon: <MessageCircleMore className="w-6 h-6" /> },
+    { path: '/chat', label: 'Messages', icon: <MessageCircleMore className="w-6 h-6" /> },
     { path: '/notifications', label: 'Notifications', icon: <Bell className="w-6 h-6" /> },
     { path: '/create', label: 'Create', icon: <CirclePlus className="w-6 h-6" /> },
     { path: '/settings', label: 'Settings', icon: <Settings className="w-6 h-6" /> },
@@ -22,7 +22,7 @@ const navItems = [
 
 const mobileNavItems = [
     { path: '/', label: 'Home', icon: <House className="w-6 h-6" /> },
-    { path: '/search', label: 'Search', icon: <Search className="w-6 h-6" /> },
+    { path: '/chat', label: 'Search', icon: <MessageCircleMore className="w-6 h-6" /> },
     { path: '/create', label: 'Create', icon: <CirclePlus className="w-6 h-6" /> },
     { path: '/notifications', label: 'Notifications', icon: <Bell className="w-6 h-6" /> },
 ];
@@ -38,7 +38,7 @@ const LeftSidebar = () => {
 
     const renderNavItem = (item) => {
         const isActive = currentPath === item.path;
-        const baseClasses = 'flex items-center justify-center xl:justify-start w-full px-4 py-3 rounded-xl text-gray-700 hover:text-gray-900 hover:bg-gray-200';
+        const baseClasses = 'flex items-center justify-center xl:justify-start w-full px-4 py-3 rounded-xl text-gray-700 hover:text-gray-900 hover:bg-gray-200 cursor-pointer';
 
         if (item.path === '/create') {
             return (
@@ -68,6 +68,15 @@ const LeftSidebar = () => {
 
     return (
         <>
+            <div className="fixed left-0 right-0 top-0 bg-white border-b border-gray-200 shadow-xs flex justify-between items-center md:hidden h-12 px-5 z-50">
+                <div>
+                    <img src={Logo} className="w-10 h-10" alt="Logo" />
+                </div>
+                <div className="flex gap-8">
+                    <Search onClick={() => setShowSearchModel(true)} className='cursor-pointer' />
+                    <LogOut className='cursor-pointer' onClick={logoutMutation} />
+                </div>
+            </div>
             {/* Desktop Sidebar */}
             <motion.div
                 initial={{ x: -60, opacity: 0 }}
@@ -82,7 +91,7 @@ const LeftSidebar = () => {
 
                 <nav className="mt-6 flex-1 flex flex-col items-center xl:items-start px-2 xl:px-4 space-y-3 overflow-y-auto">
                     {navItems.map(renderNavItem)}
-                    <button onClick={logoutMutation} className="flex items-center justify-center xl:justify-start w-full px-4 py-3 rounded-xl text-gray-700 hover:text-gray-900 hover:bg-gray-200">
+                    <button onClick={logoutMutation} className="flex items-center justify-center xl:justify-start w-full px-4 py-3 rounded-xl text-gray-700 hover:text-gray-900 hover:bg-gray-200 cursor-pointer">
                         <LogOut />
                         <span className="hidden xl:inline ml-3">Logout</span>
                     </button>
@@ -108,20 +117,12 @@ const LeftSidebar = () => {
                 initial={{ y: 60, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.4 }}
-                className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg flex justify-around items-center md:hidden h-16 z-50"
+                className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg flex justify-around items-center md:hidden h-13 z-50"
             >
                 {mobileNavItems.map((item) => {
                     if (item.path === '/create') {
                         return (
-                            <button key={item.label} onClick={() => setShowCreateModel(true)} className="flex flex-col items-center justify-center text-gray-700">
-                                {item.icon}
-                                <span className="hidden xl:inline ml-3">{item.label}</span>
-                            </button>
-                        );
-                    }
-                    if (item.path === '/search') {
-                        return (
-                            <button key={item.label} onClick={() => setShowSearchModel(true)} className="flex flex-col items-center justify-center text-gray-700">
+                            <button key={item.label} onClick={() => setShowCreateModel(true)} className="flex flex-col items-center justify-center text-gray-700 cursor-pointer">
                                 {item.icon}
                                 <span className="hidden xl:inline ml-3">{item.label}</span>
                             </button>

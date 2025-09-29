@@ -56,7 +56,7 @@ const UpdateProfile = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 relative">
+        <div className="min-h-screen flex items-center justify-center py-15 md:py-0 p-4 relative">
             <div className="w-full fade-in">
                 <div className="backdrop-blur-xl bg-white border border-white/20 rounded-3xl shadow-2xl p-8">
                     <h2 className="text-2xl text-center font-bold text-gray-800 mb-4">Update Your Profile</h2>
@@ -154,7 +154,7 @@ const UpdateProfile = () => {
 
                         {/* SUBMIT */}
                         <div className="pt-2">
-                            <button type="submit" className="bg-gradient-to-r from-blue-500 to-purple-500 shadow-lg hover:scale-101 active:scale-95 w-full px-6 py-3 rounded-xl text-base text-white font-semibold" disabled={isPending} aria-busy={isPending} aria-label="Submit">
+                            <button type="submit" className="bg-gradient-to-r from-blue-500 to-purple-500 shadow-lg hover:scale-101 active:scale-95 w-full px-6 py-3 rounded-xl text-base text-white font-semibold cursor-pointer" disabled={isPending} aria-busy={isPending} aria-label="Submit">
                                 {isPending ? <span className="loading loading-spinner loading-xs" aria-hidden="true">Updating...</span> : "Save Changes"}
                             </button>
                         </div>

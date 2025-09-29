@@ -107,3 +107,8 @@ export const updateProfile = async (userId, updateData) => {
     });
     return response.data;
 }
+
+export const getChatData = async (userId) => {
+    const response = await axiosInstance.get(`/messages/get-messages/${userId}`);
+    return response.data;
+}

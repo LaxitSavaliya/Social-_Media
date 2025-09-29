@@ -62,7 +62,7 @@ const ProfilePage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="max-w-5xl mx-auto p-4 md:p-6 bg-gray-50 min-h-screen"
+            className="max-w-5xl mx-auto py-15 p-4 md:p-6 bg-gray-50 min-h-screen"
         >
             {/* PROFILE HEADER */}
             <div className="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-14">
@@ -77,13 +77,13 @@ const ProfilePage = () => {
                         <h1 className="text-2xl font-semibold">{user.userName}</h1>
 
                         {user._id !== authUser?._id ? (
-                            <div className="flex flex-wrap gap-2 md:gap-3 ml-0 md:ml-10">
+                            <div className="flex flex-wrap items-center gap-2 md:gap-3 ml-0 md:ml-10">
                                 <button onClick={handleFollowClick} className={`px-5 py-1.5 rounded-lg text-sm font-medium transition-colors ${isRequested || isMyFollowing ? "bg-gray-200 hover:bg-gray-300" : "bg-blue-500 hover:bg-blue-600 text-white"}`}>{isRequested ? "Requested" : isMyFollowing ? "Following" : "Follow"}</button>
-                                <button className="px-5 py-1.5 rounded-lg text-sm bg-gray-200 hover:bg-gray-300">Message</button>
+                                <Link to={`/chat/${user?._id}`} className="px-5 py-1.5 rounded-lg text-sm bg-gray-200 hover:bg-gray-300">Message</Link>
                                 <Ellipsis className="w-5 h-5 text-gray-600 cursor-pointer" />
                             </div>
                         ) : (
-                            <div className="flex flex-wrap gap-2 md:gap-3 ml-0 md:ml-10">
+                            <div className="flex items-center flex-wrap gap-2 md:gap-3 ml-0 md:ml-10">
                                 <Link to={`/profile/${userName}/update-profile`} className="px-5 py-1.5 rounded-lg text-sm bg-gray-200 hover:bg-gray-300">Edit Profile</Link>
                                 <button className="px-5 py-1.5 rounded-lg text-sm bg-gray-200 hover:bg-gray-300">View Archive</button>
                                 <Settings className="w-5 h-5 text-gray-600 cursor-pointer" />
@@ -104,7 +104,7 @@ const ProfilePage = () => {
                 </div>
             </div>
 
-            <div className="mt-8 md:mt-10 border-t pt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
+            <div className="mt-8 md:mt-10 border-t pt-6 grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
                 {userPosts?.length > 0 ? userPosts.map((post) => (
                     <motion.div key={post._id} whileHover={{ scale: 1.05 }} transition={{ type: "spring", stiffness: 300 }} className="relative overflow-hidden rounded-lg group">
                         <Link to={`/post/${post._id}`}><img src={post.image || post.video} alt="Post" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300 border border-gray-200" /></Link>

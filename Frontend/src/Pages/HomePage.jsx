@@ -5,7 +5,7 @@ const HomePage = () => {
     const stories = ["Sarah", "John", "Emma", "Alex", "Mia", "James"];
 
     return (
-        <div className="flex justify-center w-full">
+        <div className="flex justify-center w-full py-10 md:py-0 px-3">
             <div className="flex-1 w-full sm:max-w-xl lg:max-w-2xl mx-auto">
 
                 {/* STORIES */}

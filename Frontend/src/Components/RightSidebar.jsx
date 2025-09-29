@@ -8,6 +8,7 @@ import useAuthUser from "../Hooks/useAuthUser";
 import useFollowRequest from "../Hooks/useFollowRequest";
 import useNotifications from "../Hooks/useNotifications";
 import useCancelFollowReqs from "../Hooks/useCancleFollowReqs";
+import { Link } from "react-router";
 
 const RightSidebar = () => {
     const { authUser } = useAuthUser();
@@ -50,11 +51,9 @@ const RightSidebar = () => {
                     {recommendedUsers.length > 0 ? recommendedUsers.map((user) => {
                         const isRequested = pendingRecipientIds.includes(user._id);
                         return (
-                            <motion.div
+                            <div
                                 key={user._id}
                                 className="flex items-center justify-between p-2 rounded-xl hover:bg-gray-50 transition"
-                                whileHover={{ scale: 1.02 }}
-                                transition={{ type: "spring", stiffness: 200 }}
                             >
                                 <div className="flex items-center">
                                     {user.profilePic ? (
@@ -73,11 +72,11 @@ const RightSidebar = () => {
                                     className={`py-1.5 px-4 rounded-full font-medium text-sm transition-all ${isRequested
                                         ? "bg-gray-400 cursor-not-allowed text-white"
                                         : "bg-blue-500 hover:bg-blue-600 text-white shadow"
-                                        }`}
+                                        } cursor-pointer`}
                                 >
                                     {isRequested ? "Requested" : "Follow"}
                                 </button>
-                            </motion.div>
+                            </div>
                         );
                     }) : <p className="text-gray-500 text-sm">No suggestions right now</p>}
                 </div>
@@ -93,11 +92,9 @@ const RightSidebar = () => {
                 <h3 className="font-semibold text-gray-900 mb-4">Online Friends</h3>
                 <div className="flex flex-col max-h-60 overflow-y-auto scrollbar-hide">
                     {allOnlineFriends.length > 0 ? allOnlineFriends.map((user) => (
-                        <motion.div
+                        <div
                             key={user._id}
                             className="flex items-center justify-between p-2 rounded-xl hover:bg-gray-50 transition"
-                            whileHover={{ scale: 1.02 }}
-                            transition={{ type: "spring", stiffness: 200 }}
                         >
                             <div className="flex items-center">
                                 {user.profilePic ? (
@@ -110,10 +107,10 @@ const RightSidebar = () => {
                                     <p className="text-sm text-gray-500">{user.fullName}</p>
                                 </div>
                             </div>
-                            <button className="py-1.5 px-4 rounded-full border font-medium text-sm hover:bg-blue-500 hover:text-white transition-all">
+                            <Link to={`/chat/${user._id}`} className="py-1.5 px-4 rounded-full border font-medium text-sm hover:bg-blue-500 hover:text-white transition-all">
                                 Message
-                            </button>
-                        </motion.div>
+                            </Link>
+                        </div>
                     )) : <p className="text-gray-500 text-sm">No friends online</p>}
                 </div>
             </motion.div>

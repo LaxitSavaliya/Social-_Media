@@ -94,7 +94,7 @@ export async function getUserPosts(req, res) {
 
         if (!post) return res.status(404).json({ message: 'Post not found' });
 
-        const userPosts = await Post.find({ postedBy: post.postedBy, _id: { $ne: post._id } }).sort({ createdAt: -1 });
+        const userPosts = await Post.find({ postedBy: post.postedBy, _id: { $ne: post._id } }).sort({ createdAt: -1 }).limit(6);
 
         res.status(200).json({ message: 'Posts fetched successfully', post, userPosts });
     } catch (error) {
