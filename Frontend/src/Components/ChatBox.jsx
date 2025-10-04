@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { io } from "socket.io-client";
-import { Ellipsis, SendHorizonal, User } from "lucide-react";
+import { Ellipsis, EllipsisVertical, Phone, SendHorizonal, User, Video } from "lucide-react";
 
 const socket = io("http://localhost:3000");
 
@@ -23,7 +23,11 @@ const ChatBox = ({ currentUser }) => {
     });
 
     useEffect(() => {
-        if (chatData?.message.length) setMessages(chatData?.message);
+        if (chatData?.message.length) {
+            setMessages(chatData?.message);
+        } else {
+            setMessages([]);
+        }
     }, [chatData]);
 
     useEffect(() => {
@@ -69,72 +73,105 @@ const ChatBox = ({ currentUser }) => {
         setText("");
     };
 
+    const formatDate = (dateStr) => {
+        const date = new Date(dateStr);
+        const now = new Date();
+        if (
+            date.getFullYear() === now.getFullYear() &&
+            date.getMonth() === now.getMonth() &&
+            date.getDate() === now.getDate()
+        ) {
+            return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        } else {
+            return date.toLocaleDateString() + " " + date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        }
+    };
+
 
     return (
-        <div className="md:border h-full w-full md:w-3/4 flex flex-col">
-            <div className="flex items-center p-4 bg-white border-b shadow-sm">
-                {chatData?.user.profilePic ? (
-                    <img
-                        src={chatData?.user.profilePic}
-                        alt="profile"
-                        className="h-10 w-10 rounded-full bg-gray-100 object-cover"
+        <>
+            {/* Chat Header */}
+            <header className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
+                <div className="flex items-center gap-4">
+                    <div
+                        className="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-12 w-12"
+                        style={{ backgroundImage: `url(${chatData?.user.profilePic || ""})` }}
                     />
-                ) : (
-                    <User className="h-10 w-10 rounded-full bg-gray-100 p-1" />
-                )}
-                <h1 className="ml-4 font-semibold text-gray-800 text-sm sm:text-base">
-                    {chatData?.user.fullName}
-                </h1>
-                <Ellipsis className="ml-auto text-gray-400 cursor-pointer hover:text-gray-600" />
-            </div>
+                    <div>
+                        <h2 className="text-gray-800 text-lg font-bold">
+                            {chatData?.user.fullName || "User"}
+                        </h2>
+                        <p className="text-green-500 text-sm">Online</p>
+                    </div>
+                </div>
+                <div className="flex gap-3">
+                    <button className="bg-gray-200 p-2 rounded-full cursor-pointer hover:bg-green-200">
+                        <Phone />
+                    </button>
+                    <button className="bg-gray-200 p-2 rounded-full cursor-pointer hover:bg-blue-200">
+                        <Video />
+                    </button>
+                    <button className="bg-gray-200 p-2 rounded-full cursor-pointer hover:bg-gray-300">
+                        <EllipsisVertical />
+                    </button>
+                </div>
+            </header>
 
-            <div className="flex-1 flex flex-col gap-2 p-4 sm:p-5 overflow-y-auto scrollbar-hide bg-gray-50">
-                <AnimatePresence initial={false}>
-                    {messages.map((message) => {
-                        const senderId = message.sender?._id || message.sender;
-                        const isSentByCurrentUser = senderId === currentUser._id;
-
-                        return (
-                            <motion.div
-                                key={message._id}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: 10 }}
-                                transition={{ duration: 0.25 }}
-                                className={`flex ${isSentByCurrentUser ? "justify-end" : "justify-start"}`}
+            {/* Chat Messages */}
+            <div className="flex-1 p-4 sm:p-6 overflow-y-auto space-y-4 bg-gray-50 scrollbar-hide">
+                {messages.map((msg) => {
+                    const isSentByUser = (msg.sender?._id || msg.sender) === currentUser._id;
+                    return (
+                        <div
+                            key={msg._id}
+                            className={`flex gap-3 ${isSentByUser ? "justify-end items-end" : "justify-start items-start"}`}
+                        >
+                            {!isSentByUser && (
+                                <div
+                                    className="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-10 w-10"
+                                    style={{ backgroundImage: `url(${chatData?.user.profilePic || ""})` }}
+                                />
+                            )}
+                            <div
+                                className={`flex p-2 gap-3 rounded-2xl max-w-xs sm:max-w-md ${isSentByUser
+                                    ? "bg-blue-500 rounded-br-none text-white"
+                                    : "bg-gray-200 rounded-tl-none"
+                                    }`}
                             >
-                                <span
-                                    className={`px-4 py-2 rounded-2xl max-w-[70%] break-words whitespace-pre-wrap text-sm sm:text-base ${isSentByCurrentUser ? "bg-blue-500 text-white" : "bg-gray-700 text-white"
-                                        }`}
-                                >
-                                    {message.text}
-                                </span>
-                            </motion.div>
-                        );
-                    })}
-                </AnimatePresence>
+                                <span className="text-[15px] p-0.5">{msg.text}</span>
+                                <span className={`text-[11px] self-end ${isSentByUser ? "text-gray-300" : "text-gray-500"}`}>{formatDate(msg.createdAt).toLocaleUpperCase()}</span>
+                            </div>
+                            {isSentByUser && (
+                                <div
+                                    className="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-10 w-10"
+                                    style={{ backgroundImage: `url(${currentUser?.profilePic || ""})` }}
+                                />
+                            )}
+                        </div>
+                    );
+                })}
                 <div ref={bottomRef}></div>
             </div>
 
-            <div className="p-4 bg-white border-t flex-shrink-0">
+            {/* Message Input */}
+            <div className="p-4 border-t border-gray-200 bg-white">
                 <form onSubmit={handleSend} className="flex items-center gap-3">
                     <input
                         type="text"
                         placeholder="Type a message..."
                         value={text}
                         onChange={(e) => setText(e.target.value)}
-                        className="flex-1 border rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
+                        className="flex-1 px-4 py-2 rounded-full bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <button
                         type="submit"
-                        className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full flex items-center justify-center"
+                        className="bg-blue-500 text-white rounded-full h-10 w-10 flex items-center justify-center hover:bg-blue-600 transition-colors"
                     >
-                        <SendHorizonal className="h-5 w-5 sm:h-6 sm:w-6" />
+                        <span className="material-symbols-outlined"><SendHorizonal className="size-5" /></span>
                     </button>
                 </form>
             </div>
-
-        </div>
+        </>
     )
 }
 

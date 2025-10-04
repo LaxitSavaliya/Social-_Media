@@ -33,7 +33,7 @@ export async function createPost(req, res) {
 
 export async function getPosts(req, res) {
     try {
-        const friendsIds = [...req.user.followers, ...req.user.following].map(f => f._id.toString());
+        const friendsIds = [...req.user.followers, ...req.user.following, req.user._id].map(f => f._id.toString());
 
         const posts = await Post.find({ postedBy: { $in: friendsIds } })
             .populate({
