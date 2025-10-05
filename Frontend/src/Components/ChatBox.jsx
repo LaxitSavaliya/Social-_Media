@@ -1,15 +1,14 @@
 import { useParams } from "react-router";
 import { getChatData } from "../Lib/api";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useEffect, useRef, useState } from "react";
 
 import { io } from "socket.io-client";
-import { Ellipsis, EllipsisVertical, Phone, SendHorizonal, User, Video } from "lucide-react";
+import { EllipsisVertical, Phone, SendHorizonal, User, Video } from "lucide-react";
 
 const socket = io("http://localhost:3000");
 
-const ChatBox = ({ currentUser }) => {
+const ChatBox = ({ currentUser, onlineUsers }) => {
 
     const { userId } = useParams();
     const [text, setText] = useState("");
@@ -73,19 +72,48 @@ const ChatBox = ({ currentUser }) => {
         setText("");
     };
 
-    const formatDate = (dateStr) => {
+    const formatTime = (dateStr) => {
         const date = new Date(dateStr);
-        const now = new Date();
-        if (
-            date.getFullYear() === now.getFullYear() &&
-            date.getMonth() === now.getMonth() &&
-            date.getDate() === now.getDate()
-        ) {
-            return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-        } else {
-            return date.toLocaleDateString() + " " + date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-        }
+        return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }).toLocaleUpperCase();
     };
+
+    const getDayLabel = (dateStr) => {
+        const date = new Date(dateStr);
+        const today = new Date();
+
+        const isToday =
+            date.getDate() === today.getDate() &&
+            date.getMonth() === today.getMonth() &&
+            date.getFullYear() === today.getFullYear();
+
+        const yesterday = new Date();
+        yesterday.setDate(today.getDate() - 1);
+        const isYesterday =
+            date.getDate() === yesterday.getDate() &&
+            date.getMonth() === yesterday.getMonth() &&
+            date.getFullYear() === yesterday.getFullYear();
+
+        if (isToday) return "Today";
+        if (isYesterday) return "Yesterday";
+
+        const diffInDays = Math.floor(
+            (today - date) / (1000 * 60 * 60 * 24)
+        );
+
+        // If within last 7 days → show weekday (e.g. Monday)
+        if (diffInDays < 7) {
+            return date.toLocaleDateString([], { weekday: "long" });
+        }
+
+        // Else → show "October 02, 2025"
+        return date.toLocaleDateString([], {
+            month: "long",
+            day: "2-digit",
+            year: "numeric",
+        });
+    };
+
+    const isUserOnline = (userId) => onlineUsers.includes(userId);
 
 
     return (
@@ -101,73 +129,96 @@ const ChatBox = ({ currentUser }) => {
                         <h2 className="text-gray-800 text-lg font-bold">
                             {chatData?.user.fullName || "User"}
                         </h2>
-                        <p className="text-green-500 text-sm">Online</p>
+                        {isUserOnline(chatData?.user?._id) ? (
+                            <p className="text-green-500 text-sm">Online</p>
+                        ) : (
+                            <p className="text-gray-500 text-sm">Offline</p>
+                        )}
                     </div>
                 </div>
                 <div className="flex gap-3">
-                    <button className="bg-gray-200 p-2 rounded-full cursor-pointer hover:bg-green-200">
-                        <Phone />
+                    <button className="bg-gray-100 hover:text-green-600 transition-colors p-2 rounded-full hover:bg-gray-200 cursor-pointer">
+                        <Phone size={20} />
                     </button>
-                    <button className="bg-gray-200 p-2 rounded-full cursor-pointer hover:bg-blue-200">
-                        <Video />
+                    <button className="bg-gray-100 hover:text-blue-600 transition-colors p-2 rounded-full hover:bg-gray-200 cursor-pointer">
+                        <Video size={20} />
                     </button>
-                    <button className="bg-gray-200 p-2 rounded-full cursor-pointer hover:bg-gray-300">
-                        <EllipsisVertical />
+                    <button className="bg-gray-100 hover:text-gray-800 transition-colors p-2 rounded-full hover:bg-gray-200 cursor-pointer">
+                        <EllipsisVertical size={20} />
                     </button>
                 </div>
             </header>
 
             {/* Chat Messages */}
             <div className="flex-1 p-4 sm:p-6 overflow-y-auto space-y-4 bg-gray-50 scrollbar-hide">
-                {messages.map((msg) => {
+                {messages.map((msg, index) => {
                     const isSentByUser = (msg.sender?._id || msg.sender) === currentUser._id;
+                    const currentDay = getDayLabel(msg.createdAt);
+                    const prevDay = index > 0 ? getDayLabel(messages[index - 1].createdAt) : null;
+                    const showDayLabel = currentDay !== prevDay;
+
                     return (
-                        <div
-                            key={msg._id}
-                            className={`flex gap-3 ${isSentByUser ? "justify-end items-end" : "justify-start items-start"}`}
-                        >
-                            {!isSentByUser && (
-                                <div
-                                    className="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-10 w-10"
-                                    style={{ backgroundImage: `url(${chatData?.user.profilePic || ""})` }}
-                                />
+                        <React.Fragment key={msg._id}>
+                            {showDayLabel && (
+                                <div className="text-center text-gray-600 text-xs my-2 font-medium">
+                                    {currentDay}
+                                </div>
                             )}
+
                             <div
-                                className={`flex p-2 gap-3 rounded-2xl max-w-xs sm:max-w-md ${isSentByUser
-                                    ? "bg-blue-500 rounded-br-none text-white"
-                                    : "bg-gray-200 rounded-tl-none"
-                                    }`}
+                                className={`flex gap-3 w-full ${isSentByUser ? "justify-end" : "justify-start"}`}
                             >
-                                <span className="text-[15px] p-0.5">{msg.text}</span>
-                                <span className={`text-[11px] self-end ${isSentByUser ? "text-gray-300" : "text-gray-500"}`}>{formatDate(msg.createdAt).toLocaleUpperCase()}</span>
-                            </div>
-                            {isSentByUser && (
+                                {!isSentByUser && (
+                                    <div
+                                        className="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-6 w-6"
+                                        style={{ backgroundImage: `url(${chatData?.user.profilePic || ""})` }}
+                                    />
+                                )}
+
                                 <div
-                                    className="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-10 w-10"
-                                    style={{ backgroundImage: `url(${currentUser?.profilePic || ""})` }}
-                                />
-                            )}
-                        </div>
+                                    className={`relative max-w-[80%] sm:max-w-[65%] px-3 py-2 rounded-2xl text-[15px] leading-tight break-words whitespace-pre-wrap ${isSentByUser
+                                        ? "rounded-br-none bg-blue-500 text-white"
+                                        : "rounded-tl-none bg-gray-200"
+                                        }`}
+                                >
+                                    <span>{msg.text}</span>
+                                    <span
+                                        className={`block text-[11px] mt-1 text-right whitespace-nowrap ${isSentByUser ? "text-gray-300" : "text-gray-400"
+                                            }`}
+                                    >
+                                        {formatTime(msg.createdAt)}
+                                    </span>
+                                </div>
+
+                                {isSentByUser && (
+                                    <div
+                                        className="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-6 w-6 mt-auto"
+                                        style={{ backgroundImage: `url(${currentUser?.profilePic || ""})` }}
+                                    />
+                                )}
+                            </div>
+                        </React.Fragment>
                     );
                 })}
                 <div ref={bottomRef}></div>
             </div>
 
+
             {/* Message Input */}
-            <div className="p-4 border-t border-gray-200 bg-white">
+            <div className="px-4 py-3 bg-white border-t border-gray-300">
                 <form onSubmit={handleSend} className="flex items-center gap-3">
                     <input
                         type="text"
-                        placeholder="Type a message..."
+                        placeholder="Type a message"
                         value={text}
                         onChange={(e) => setText(e.target.value)}
-                        className="flex-1 px-4 py-2 rounded-full bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="flex-1 px-4 py-2 bg-gray-100 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <button
                         type="submit"
-                        className="bg-blue-500 text-white rounded-full h-10 w-10 flex items-center justify-center hover:bg-blue-600 transition-colors"
+                        className="bg-blue-500 text-white rounded-full h-10 w-10 flex items-center justify-center hover:bg-blue-600 transition-colors cursor-pointer"
                     >
-                        <span className="material-symbols-outlined"><SendHorizonal className="size-5" /></span>
+                        <SendHorizonal className="size-5" />
                     </button>
                 </form>
             </div>

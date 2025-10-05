@@ -7,16 +7,18 @@ import toast from "react-hot-toast";
 
 import timeAgo from "../Lib/timeAgo";
 import { getPosts } from "../Lib/api";
-import useAuthUser from "../Hooks/useAuthUser";
 import usePostLike from "../Hooks/usePostLike";
 import usePostComment from "../Hooks/usePostComment";
 import PopupBox from "./PopupBox";
 
+import { useOnlineUsers } from "../Context/OnlineUsersContext";
+
 const PostCard = () => {
+
+    const { currentUser, onlineUsers } = useOnlineUsers();
     const [openLikeBox, setOpenLikeBox] = useState(false);
     const [selectedLikes, setSelectedLikes] = useState([]);
     const [expandedPosts, setExpandedPosts] = useState(new Set());
-    const { authUser } = useAuthUser();
 
     // Fetch posts
     const { data: postsData } = useQuery({ queryKey: ["posts"], queryFn: getPosts });
@@ -25,7 +27,7 @@ const PostCard = () => {
     const { likePending, toggleLikeToPost } = usePostLike();
     const { addComment } = usePostComment();
 
-    const friends = [...(authUser?.followers || []), ...(authUser?.following || [])];
+    const friends = [...(currentUser?.followers || []), ...(currentUser?.following || [])];
     const allFriends = friends.filter((friend, index, self) => index === self.findIndex((f) => f._id === friend._id));
 
     const getRelevantLikes = useCallback(
@@ -47,11 +49,13 @@ const PostCard = () => {
         setExpandedPosts(newExpanded);
     };
 
+    const isUserOnline = (userId) => onlineUsers.includes(userId);
+
     return (
         <div className="space-y-6 pb-6">
             <AnimatePresence mode="popLayout">
                 {allPosts.map((post, idx) => {
-                    const currentUserId = authUser?._id?.toString();
+                    const currentUserId = currentUser?._id?.toString();
                     const hasLiked = post.likes?.some((like) => like?._id?.toString() === currentUserId);
                     const relevantLikes = getRelevantLikes(post);
                     const isExpanded = expandedPosts.has(post._id);
@@ -95,7 +99,7 @@ const PostCard = () => {
                                             <User className="w-12 h-12 rounded-full bg-gradient-to-r from-gray-200 to-gray-300 p-2 ring-2 ring-gray-100" />
                                         )}
                                         <motion.div
-                                            className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full"
+                                            className={`${isUserOnline(post?.postedBy?._id) ? "absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-white rounded-full" : ""}`}
                                             animate={{ scale: [1, 1.2, 1] }}
                                             transition={{ duration: 2, repeat: Infinity }}
                                         />

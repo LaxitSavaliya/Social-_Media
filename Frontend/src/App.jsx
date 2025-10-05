@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import PageLoader from './Components/PageLoader';
 import Layout from './Components/Layout';
 import useAuthUser from './Hooks/useAuthUser';
+import { OnlineUsersProvider } from './Context/OnlineUsersContext';
 
 const SignUpPage = lazy(() => import('./Pages/SignUpPage'));
 const LoginPage = lazy(() => import('./Pages/LoginPage'));
@@ -39,36 +40,38 @@ const pageVariants = {
 const pageTransition = { duration: 0.3, ease: 'easeInOut' };
 
 const App = () => {
-  const { isLoading } = useAuthUser();
+  const { authUser, isLoading } = useAuthUser();
 
   if (isLoading) return <PageLoader />;
 
   return (
-    <div className='h-screen gradient-bg'>
-      <Suspense fallback={<PageLoader />}>
-        <AnimatePresence exitBeforeEnter>
-          <Routes>
-            {/* Public Routes */}
-            <Route path='/signup' element={<PageMotion><SignUpPageRedirect /></PageMotion>} />
-            <Route path='/login' element={<PageMotion><LoginPageRedirect /></PageMotion>} />
-            <Route path='/onboarding' element={<PageMotion><OnboardingRedirect /></PageMotion>} />
+    <OnlineUsersProvider currentUser={authUser}>
+      <div className='h-screen gradient-bg'>
+        <Suspense fallback={<PageLoader />}>
+          <AnimatePresence exitBeforeEnter>
+            <Routes>
+              {/* Public Routes */}
+              <Route path='/signup' element={<PageMotion><SignUpPageRedirect /></PageMotion>} />
+              <Route path='/login' element={<PageMotion><LoginPageRedirect /></PageMotion>} />
+              <Route path='/onboarding' element={<PageMotion><OnboardingRedirect /></PageMotion>} />
 
-            {/* Protected Routes */}
-            <Route path='/' element={<ProtectedRoute><Layout showRightSidebar><PageMotion><HomePage /></PageMotion></Layout></ProtectedRoute>} />
-            <Route path='/profile/:userName' element={<ProtectedRoute><Layout><PageMotion><ProfilePage /></PageMotion></Layout></ProtectedRoute>} />
-            <Route path='/notifications' element={<ProtectedRoute><Layout><PageMotion><Notification /></PageMotion></Layout></ProtectedRoute>} />
-            <Route path='/post/:postId' element={<ProtectedRoute><Layout><PageMotion><PostPage /></PageMotion></Layout></ProtectedRoute>} />
-            <Route path='/profile/:userName/update-profile' element={<ProtectedRoute><Layout><PageMotion><UpdateProfile /></PageMotion></Layout></ProtectedRoute>} />
-            <Route path='/chat' element={<ProtectedRoute><Layout><PageMotion><ChatPage /></PageMotion></Layout></ProtectedRoute>} />
-            <Route path='/chat/:userId' element={<ProtectedRoute><Layout><PageMotion><ChatPage showChat /></PageMotion></Layout></ProtectedRoute>} />
+              {/* Protected Routes */}
+              <Route path='/' element={<ProtectedRoute><Layout showRightSidebar><PageMotion><HomePage /></PageMotion></Layout></ProtectedRoute>} />
+              <Route path='/profile/:userName' element={<ProtectedRoute><Layout><PageMotion><ProfilePage /></PageMotion></Layout></ProtectedRoute>} />
+              <Route path='/notifications' element={<ProtectedRoute><Layout><PageMotion><Notification /></PageMotion></Layout></ProtectedRoute>} />
+              <Route path='/post/:postId' element={<ProtectedRoute><Layout><PageMotion><PostPage /></PageMotion></Layout></ProtectedRoute>} />
+              <Route path='/profile/:userName/update-profile' element={<ProtectedRoute><Layout><PageMotion><UpdateProfile /></PageMotion></Layout></ProtectedRoute>} />
+              <Route path='/chat' element={<ProtectedRoute><Layout><PageMotion><ChatPage /></PageMotion></Layout></ProtectedRoute>} />
+              <Route path='/chat/:userId' element={<ProtectedRoute><Layout><PageMotion><ChatPage showChat /></PageMotion></Layout></ProtectedRoute>} />
 
-            {/* 404 */}
-            <Route path='*' element={<PageMotion><PageNotFound /></PageMotion>} />
-          </Routes>
-        </AnimatePresence>
-      </Suspense>
-      <Toaster />
-    </div>
+              {/* 404 */}
+              <Route path='*' element={<PageMotion><PageNotFound /></PageMotion>} />
+            </Routes>
+          </AnimatePresence>
+        </Suspense>
+        <Toaster />
+      </div>
+    </OnlineUsersProvider>
   );
 };
 

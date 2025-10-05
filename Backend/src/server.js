@@ -63,6 +63,8 @@ app.use((err, req, res, next) => {
     });
 });
 
+const onlineUsers = new Map(); // key: userId, value: socketId(s)
+
 const server = http.createServer(app);
 
 const io = new Server(server, {
@@ -77,7 +79,18 @@ io.on('connection', (socket) => {
 
     socket.on('join', (userId) => {
         socket.join(userId);
-        console.log(`✅ User ${userId} joined their room`);
+
+        // Track online users
+        if (onlineUsers.has(userId)) {
+            onlineUsers.get(userId).add(socket.id);
+        } else {
+            onlineUsers.set(userId, new Set([socket.id]));
+        }
+
+        console.log(`✅ User ${userId} joined. Online users:`, Array.from(onlineUsers.keys()));
+
+        // Send online users list to all clients
+        io.emit('onlineUsers', Array.from(onlineUsers.keys()));
     });
 
     socket.on('sendMessage', async ({ sender, recipient, text }) => {
@@ -94,6 +107,19 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
         console.log('❌ User disconnected:', socket.id);
+
+        // Remove socket from online users
+        for (const [userId, sockets] of onlineUsers.entries()) {
+            if (sockets.has(socket.id)) {
+                sockets.delete(socket.id);
+                if (sockets.size === 0) {
+                    onlineUsers.delete(userId);
+                }
+            }
+        }
+
+        // Update all clients
+        io.emit('onlineUsers', Array.from(onlineUsers.keys()));
     });
 });
 

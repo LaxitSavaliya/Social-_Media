@@ -4,21 +4,29 @@ import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 
 import { getRecommendedUsers } from "../Lib/api";
-import useAuthUser from "../Hooks/useAuthUser";
 import useFollowRequest from "../Hooks/useFollowRequest";
 import useNotifications from "../Hooks/useNotifications";
 import useCancelFollowReqs from "../Hooks/useCancleFollowReqs";
 import { Link } from "react-router";
+import { useOnlineUsers } from "../Context/OnlineUsersContext";
 
 const RightSidebar = () => {
-    const { authUser } = useAuthUser();
+
+    const { currentUser, onlineUsers } = useOnlineUsers();
     const { cancelFollowPendig, removeOrCancelFollowMutation } = useCancelFollowReqs();
     const { followReqsPending, followReqsMutation } = useFollowRequest();
     const { data: recommendedUsers = [] } = useQuery({ queryKey: ["users"], queryFn: getRecommendedUsers });
     const { data: notifications } = useNotifications();
 
-    const onlineFriends = [...(authUser?.followers || []), ...(authUser?.following || [])];
-    const allOnlineFriends = onlineFriends.filter((friend, index, self) => index === self.findIndex((f) => f._id === friend._id)).slice(0, 4);
+    const friends = [...(currentUser?.followers || []), ...(currentUser?.following || [])];
+
+    // Remove duplicates
+    const uniqueFriends = friends.filter((friend, index, self) =>
+        index === self.findIndex((f) => f._id === friend._id)
+    );
+
+    // Filter only online friends
+    const onlineFriends = uniqueFriends.filter((friend) => onlineUsers.includes(friend._id)).slice(0, 4);
 
     const allRequests = notifications?.sendedRequests || [];
     const pendingRecipientIds = allRequests.filter(req => req.status === "pending").map(req => req.recipient._id);
@@ -53,7 +61,7 @@ const RightSidebar = () => {
                         return (
                             <div
                                 key={user._id}
-                                className="flex items-center justify-between p-2 rounded-xl hover:bg-gray-50 transition"
+                                className="flex items-center justify-between p-2 rounded-xl transition"
                             >
                                 <div className="flex items-center">
                                     {user.profilePic ? (
@@ -62,7 +70,7 @@ const RightSidebar = () => {
                                         <User className="w-10 h-10 rounded-full p-1.5 bg-gray-200" />
                                     )}
                                     <div className="ml-3">
-                                        <h4 className="font-medium text-gray-900">{user.userName}</h4>
+                                        <Link to={`/profile/${user.userName}`} className="font-medium text-gray-900">{user.userName}</Link>
                                         <p className="text-sm text-gray-500">{user.fullName}</p>
                                     </div>
                                 </div>
@@ -91,10 +99,10 @@ const RightSidebar = () => {
             >
                 <h3 className="font-semibold text-gray-900 mb-4">Online Friends</h3>
                 <div className="flex flex-col max-h-60 overflow-y-auto scrollbar-hide">
-                    {allOnlineFriends.length > 0 ? allOnlineFriends.map((user) => (
+                    {onlineFriends.length > 0 ? onlineFriends.map((user) => (
                         <div
                             key={user._id}
-                            className="flex items-center justify-between p-2 rounded-xl hover:bg-gray-50 transition"
+                            className="flex items-center justify-between p-2 rounded-xl transition"
                         >
                             <div className="flex items-center">
                                 {user.profilePic ? (

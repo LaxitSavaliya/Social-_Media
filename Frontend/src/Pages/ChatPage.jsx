@@ -1,14 +1,16 @@
 import { Link } from "react-router";
-import useAuthUser from "../Hooks/useAuthUser";
 import { User } from "lucide-react";
 import ChatBox from "../Components/ChatBox";
+import { useOnlineUsers } from "../Context/OnlineUsersContext";
 
 const ChatPage = ({ showChat }) => {
 
-    const { authUser } = useAuthUser();
+    const { currentUser, onlineUsers } = useOnlineUsers();
 
-    const friends = [...(authUser?.followers || []), ...(authUser?.following || [])];
+    const friends = [...(currentUser?.followers || []), ...(currentUser?.following || [])];
     const allFriends = friends.filter((friend, index, self) => index === self.findIndex((f) => f._id === friend._id));
+
+    const isUserOnline = (userId) => onlineUsers.includes(userId);
 
     return (
         <div className="h-screen py-12 md:py-0 flex gap-4 p-2 md:p-4">
@@ -22,11 +24,11 @@ const ChatPage = ({ showChat }) => {
                 <div className="p-4 border-b border-gray-200 flex items-center gap-3">
                     <div
                         className="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-12 w-12"
-                        style={{ backgroundImage: `url(${authUser?.profilePic || ""})` }}
+                        style={{ backgroundImage: `url(${currentUser?.profilePic || ""})` }}
                     />
                     <div>
                         <h1 className="text-gray-800 text-lg font-semibold">
-                            {authUser?.fullName || authUser?.userName || "You"}
+                            {currentUser?.fullName || currentUser?.userName || "You"}
                         </h1>
                         <p className="text-green-500 text-sm">Online</p>
                     </div>
@@ -54,7 +56,7 @@ const ChatPage = ({ showChat }) => {
                                 ) : (
                                     <User className="h-12 w-12 bg-gray-200 p-1.5 rounded-full" />
                                 )}
-                                <span className="absolute bottom-0 right-0 block h-3 w-3 rounded-full bg-green-500 border-2 border-white" />
+                                <span className={`absolute bottom-0 right-0 block h-3 w-3 rounded-full ${isUserOnline(friend._id) ? "bg-green-500" : "bg-red-500"} border-2 border-white`} />
                             </div>
                             <div className="flex flex-col justify-center">
                                 <p className="text-gray-800 text-base font-medium truncate">
@@ -70,7 +72,7 @@ const ChatPage = ({ showChat }) => {
             {/* Chat Section */}
             {showChat ? (
                 <div className="flex-1 flex flex-col bg-white rounded-xl shadow">
-                    <ChatBox currentUser={authUser} />
+                    <ChatBox currentUser={currentUser} onlineUsers={onlineUsers} />
                 </div>
             ) : (
                 <div className="hidden md:flex flex-1 text-2xl font-semibold items-center justify-center bg-white rounded-xl shadow">
