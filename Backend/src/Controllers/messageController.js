@@ -15,10 +15,7 @@ export async function getMessages(req, res) {
                 { sender: req.user._id, recipient: recipientId },
                 { sender: recipientId, recipient: req.user._id },
             ]
-        })
-            .populate("sender", "userName fullName profilePic")
-            .populate("recipient", "userName fullName profilePic")
-            .sort({ createdAt: 1 });
+        }).sort({ createdAt: 1 });
 
         res.status(201).json({ user, message });
 

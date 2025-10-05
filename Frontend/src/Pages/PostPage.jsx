@@ -212,7 +212,7 @@ const PostPage = () => {
             {userPosts?.length > 0 && (
                 <motion.div className="mt-10 border-t pt-6 pb-20" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
                     <h1 className="mb-5 text-gray-600">More posts from <span className="font-semibold text-black">{post?.postedBy?.userName}</span></h1>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                         {userPosts.map((userPost) => (
                             <Link
                                 to={`/post/${userPost._id}`}
